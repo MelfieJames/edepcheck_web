@@ -1,214 +1,180 @@
 "use client";
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import MainLayout from '@/components/layout/MainLayout';
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import {
+  FaUser,
+  FaEnvelope,
+  FaUserTag,
+  FaLock,
+  FaEye,
+  FaEyeSlash,
+} from "react-icons/fa";
+import Header from "@/components/partials/Header";
 
 const SignUp: React.FC = () => {
   const router = useRouter();
   const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    username: '',
-    password: '',
-    confirmPassword: '',
+    fullName: "",
+    email: "",
+    username: "",
+    password: "",
+    confirmPassword: "",
   });
-  const [statusMessage, setStatusMessage] = useState('');
+  const [statusMessage, setStatusMessage] = useState("");
   const [isSuccessful, setIsSuccessful] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prevState) => ({ ...prevState, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
-    if (
-      !formData.fullName ||
-      !formData.email ||
-      !formData.username ||
-      !formData.password ||
-      !formData.confirmPassword
-    ) {
-      setStatusMessage('Please fill in all fields.');
+
+    const { fullName, email, username, password, confirmPassword } = formData;
+
+    if (!fullName || !email || !username || !password || !confirmPassword) {
+      setStatusMessage("Please fill in all fields.");
       setIsSuccessful(false);
       return;
     }
-  
-    if (formData.password !== formData.confirmPassword) {
-      setStatusMessage('Passwords do not match.');
+
+    if (password !== confirmPassword) {
+      setStatusMessage("Passwords do not match.");
       setIsSuccessful(false);
       return;
     }
-  
+
     try {
-      const res = await fetch('/api/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      const res = await fetch("/api/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-  
+
       const data = await res.json();
       if (!res.ok) {
-        console.error('API error:', data.message);
-        setStatusMessage(data.message || 'Something went wrong.');
+        setStatusMessage(data.message || "Something went wrong.");
         setIsSuccessful(false);
       } else {
-        setStatusMessage('Your account has been created successfully!');
+        setStatusMessage("Your account has been created successfully!");
         setIsSuccessful(true);
-        router.push('/sign/login');
+        router.push("/sign/login");
       }
     } catch (error) {
-      console.error('An error occurred:', error);
-      setStatusMessage('An error occurred. Please try again.');
+      setStatusMessage("An error occurred. Please try again.");
       setIsSuccessful(false);
-    } finally {
-      setFormData({
-        fullName: '',
-        email: '',
-        username: '',
-        password: '',
-        confirmPassword: '',
-      });
     }
-  };
-  
-
-  const handleLogIn = () => {
-    router.push('/login');
   };
 
   return (
-    <MainLayout>
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col items-center justify-center px-4">
-        <div className="text-center mb-6">
-          <img src="/images/circo logo.png" alt="Circo Recipe Share" className="h-20 mx-auto mb-4" />
-          <h1 className="text-4xl font-bold text-gray-800">Sign Up</h1>
-          <p className="text-gray-600 mt-2">Create your account to get started.</p>
-        </div>
+    <>
+      <Header />
+      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex items-center justify-center px-4 py-12">
+        <div className="w-full max-w-2xl bg-white shadow-lg rounded-xl overflow-hidden flex flex-col md:flex-row">
+          {/* Left Icon Section */}
+          <div className="bg-blue-100 flex flex-col justify-center items-center p-6 gap-4 w-full md:w-1/3">
+            <Image src="/images/Brainicon.png" alt="E-DepCheck" width={80} height={80} />
+            <h2 className="text-2xl font-bold text-[#2C1E4A] text-center">Join E-DepCheck</h2>
+            <p className="text-sm text-center text-blue-900 px-2">"Your Mental Health Matters"</p>
+          </div>
 
-        <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-md">
-          <form onSubmit={handleSubmit}>
-            <div className="mb-4">
-              <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
-                Full Name
-              </label>
-              <input
-                type="text"
-                id="fullName"
-                name="fullName"
-                value={formData.fullName}
-                onChange={handleChange}
-                className="block w-full p-2 text-sm border rounded-md"
-                required
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className="block w-full p-2 text-sm border rounded-md"
-                required
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-                Username
-              </label>
-              <input
-                type="text"
-                id="username"
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-                className="block w-full p-2 text-sm border rounded-md"
-                required
-              />
-            </div>
-            <div className="mb-4 relative">
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <input
-                type={passwordVisible ? 'text' : 'password'}
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                className="block w-full p-2 text-sm border rounded-md"
-                required
-              />
-              <button
-                type="button"
-                className="absolute inset-y-0 right-2 flex items-center text-gray-500"
-                onClick={() => setPasswordVisible(!passwordVisible)}
-              >
-                {passwordVisible ? <FaEyeSlash /> : <FaEye />}
-              </button>
-            </div>
-            <div className="mb-4 relative">
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                Confirm Password
-              </label>
-              <input
-                type={confirmPasswordVisible ? 'text' : 'password'}
-                id="confirmPassword"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                className="block w-full p-2 text-sm border rounded-md"
-                required
-              />
-              <button
-                type="button"
-                className="absolute inset-y-0 right-2 flex items-center text-gray-500"
-                onClick={() => setConfirmPasswordVisible(!confirmPasswordVisible)}
-              >
-                {confirmPasswordVisible ? <FaEyeSlash /> : <FaEye />}
-              </button>
-            </div>
+          {/* Right Form Section */}
+          <div className="w-full md:w-2/3 p-6">
+            <h1 className="text-xl font-semibold text-center text-[#2C1E4A] mb-4">Create an Account</h1>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Input Group */}
+              {[
+                { icon: FaUser, name: "fullName", placeholder: "Full Name", type: "text" },
+                { icon: FaEnvelope, name: "email", placeholder: "Email", type: "email" },
+                { icon: FaUserTag, name: "username", placeholder: "Username", type: "text" },
+              ].map(({ icon: Icon, ...input }) => (
+                <div key={input.name} className="flex items-center border rounded-md px-3 py-2 focus-within:ring-2 focus-within:ring-blue-300 transition">
+                  <Icon className="text-blue-400 mr-3" />
+                  <input
+                    {...input}
+                    value={(formData as any)[input.name]}
+                    onChange={handleChange}
+                    className="w-full outline-none text-sm bg-transparent"
+                    required
+                  />
+                </div>
+              ))}
 
-            {statusMessage && (
-              <div className={`mb-4 text-sm ${isSuccessful ? 'text-green-500' : 'text-red-500'}`}>
-                {statusMessage}
+              {/* Password */}
+              <div className="flex items-center border rounded-md px-3 py-2 relative">
+                <FaLock className="text-blue-400 mr-3" />
+                <input
+                  type={passwordVisible ? "text" : "password"}
+                  name="password"
+                  placeholder="Password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="w-full outline-none text-sm bg-transparent"
+                  required
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 text-gray-500"
+                  onClick={() => setPasswordVisible(!passwordVisible)}
+                >
+                  {passwordVisible ? <FaEyeSlash /> : <FaEye />}
+                </button>
               </div>
-            )}
 
-            <button
-              type="submit"
-              className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md w-full"
-            >
-              Sign Up
-            </button>
-          </form>
+              {/* Confirm Password */}
+              <div className="flex items-center border rounded-md px-3 py-2 relative">
+                <FaLock className="text-blue-400 mr-3" />
+                <input
+                  type={confirmPasswordVisible ? "text" : "password"}
+                  name="confirmPassword"
+                  placeholder="Confirm Password"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  className="w-full outline-none text-sm bg-transparent"
+                  required
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 text-gray-500"
+                  onClick={() => setConfirmPasswordVisible(!confirmPasswordVisible)}
+                >
+                  {confirmPasswordVisible ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
 
-          <div className="text-center my-4 text-gray-500 text-sm">or Sign in with</div>
-          
+              {/* Status Message */}
+              {statusMessage && (
+                <p className={`text-sm ${isSuccessful ? "text-green-500" : "text-red-500"}`}>
+                  {statusMessage}
+                </p>
+              )}
 
-          <div className="text-center mt-6 text-sm">
-            Already have an account?{' '}
-            <button
-              onClick={handleLogIn}
-              className="text-blue-500 hover:underline font-medium"
-            >
-              Log In
-            </button>
+              <button
+                type="submit"
+                className="w-full bg-[#2C1E4A] text-white py-2 rounded-md hover:bg-[#1f1532] transition"
+              >
+                Sign Up
+              </button>
+            </form>
+
+            <p className="text-center mt-6 text-sm text-gray-500">
+              Already have an account?{" "}
+              <button
+                className="text-blue-500 hover:underline"
+                onClick={() => router.push("/sign/login")}
+              >
+                Log In
+              </button>
+            </p>
           </div>
         </div>
       </div>
-    </MainLayout>
+    </>
   );
 };
 
